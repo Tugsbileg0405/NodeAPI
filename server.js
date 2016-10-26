@@ -56,8 +56,10 @@ apiRoutes.use(function (req, res, next) {
     }
 });
 apiRoutes.get('/articles', function (req, res) {
-    Article.find({}).exec(function (err, articles) {
-        res.json(articles);
+    Article.find()
+    .populate('createdBy')
+    .exec(function (err, articles) {
+      res.json(articles);
     })
 });
 apiRoutes.post('/articles', function (req, res) {
@@ -74,9 +76,11 @@ apiRoutes.post('/articles', function (req, res) {
     });
 });
 apiRoutes.get('/users', function (req, res) {
-    User.find({}, function (err, users) {
+    User.find()
+    .populate('article')
+    .exec(function (err, users) {
         res.json(users);
-    });
+    }) 
 });
 apiRoutes.post('/users', function (req, res) {
     var newUser = new User({
