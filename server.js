@@ -10,7 +10,7 @@ var mongoose = require('mongoose');
 var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config'); // get our config file
 var User = require('./app/models/user'); // get our mongoose model
-
+var Article = require('./app/models/article');
 // =======================
 // configuration =========
 // =======================
@@ -27,12 +27,11 @@ app.use(morgan('dev'));
 
 var apiRoutes = express.Router();
 
-
+// var token = jwt.sign({ foo: 'bar' }, 'ourfirstnewsblog');
+// console.log(token);
 apiRoutes.use(function (req, res, next) {
-
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
     // decode token
     if (token) {
 
@@ -56,7 +55,24 @@ apiRoutes.use(function (req, res, next) {
 
     }
 });
-
+apiRoutes.get('/articles', function (req, res) {
+    Article.find({}).exec(function (err, articles) {
+        res.json(articles);
+    })
+});
+apiRoutes.post('/articles', function (req, res) {
+    var newArticle = new Article({
+        caption: req.body.caption,
+        description: req.body.description,
+        createdBy: req.body.createdBy,
+        picture: req.body.picture,
+    });
+    newArticle.save(function (err) {
+        if (err) throw err;
+        console.log('Article saved successfully');
+        res.json({ success: true });
+    });
+});
 apiRoutes.get('/users', function (req, res) {
     User.find({}, function (err, users) {
         res.json(users);
@@ -64,7 +80,7 @@ apiRoutes.get('/users', function (req, res) {
 });
 apiRoutes.post('/users', function (req, res) {
     var newUser = new User({
-        name: req.body.name,
+        email: req.body.email,
         password: req.body.password,
         admin: req.body.admin
     });
