@@ -6,7 +6,6 @@ var app = express();
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var mongoose = require('mongoose');
-var cors = require('cors');
 var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config'); // get our config file
 var User = require('./app/models/user'); // get our mongoose model
@@ -21,12 +20,15 @@ app.set('superSecret', config.secret); // secret variable
 // use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(cors());
 // use morgan to log requests to the console
 app.use(morgan('dev'));
 
 var apiRoutes = express.Router();
-
+apiRoutes.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 // var token = jwt.sign({ foo: 'bar' }, 'ourfirstnewsblog');
 // console.log(token);
 apiRoutes.use(function (req, res, next) {
@@ -57,10 +59,10 @@ apiRoutes.use(function (req, res, next) {
 });
 apiRoutes.get('/articles', function (req, res) {
     Article.find()
-    .populate('createdBy')
-    .exec(function (err, articles) {
-      res.json(articles);
-    })
+        .populate('createdBy')
+        .exec(function (err, articles) {
+            res.json(articles);
+        })
 });
 apiRoutes.post('/articles', function (req, res) {
     var newArticle = new Article({
@@ -77,10 +79,10 @@ apiRoutes.post('/articles', function (req, res) {
 });
 apiRoutes.get('/users', function (req, res) {
     User.find()
-    .populate('article')
-    .exec(function (err, users) {
-        res.json(users);
-    }) 
+        .populate('article')
+        .exec(function (err, users) {
+            res.json(users);
+        })
 });
 apiRoutes.post('/users', function (req, res) {
     var newUser = new User({
