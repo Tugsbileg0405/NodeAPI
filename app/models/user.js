@@ -4,16 +4,19 @@ var Schema = mongoose.Schema;
 module.exports = mongoose.model('User', new Schema({
     email: {
         type: String,
-        required: true,
-        unique: true
+        unique: true,
+        required: true
     },
-    password: String,
+    password: {
+        type: String,
+        required: true
+    },
     admin: {
         type: Boolean,
         default: false
     },
-    article: [{
-        type: Schema.ObjectId,
-        ref: 'Article'
-    }]
+    token: {
+        type: String,
+        unique: true
+    }
 }));
